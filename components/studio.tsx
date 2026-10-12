@@ -20,25 +20,29 @@ import {
   slugName,
 } from "@/lib/export-specimen"
 import { loadGoogleFont, loadLocalFont } from "@/lib/font-loader"
+import { readSearchQuery, replacePoseUrl } from "@/lib/history-url"
 import { specimenMarkup } from "@/lib/markup"
 import { captionFor, hasCjk, layoutSpecimen, STAGE_H, STAGE_W } from "@/lib/specimen"
 import type { LoadedFont, PoseId, SpecimenLayout, StudioState, StudioView } from "@/lib/types"
-import { clampText, createState, encodeState, type SearchQuery } from "@/lib/url-state"
+import { clampText, createState, encodeState } from "@/lib/url-state"
 
 type Morph = { t: number; values: Record<string, number> } | null
 
 const FALLBACK_FAMILY = "Palatino Linotype"
 
-export function Studio({
-  initialQuery,
-  syncUrl = true,
-}: {
-  initialQuery: SearchQuery
-  syncUrl?: boolean
-}) {
-  const initial = useMemo(() => createState(initialQuery), [initialQuery])
-  const [state, setState] = useState<StudioState>(initial.state)
-  const [notice, setNotice] = useState<string | null>(initial.notice)
+export function Studio({ syncUrl = true }: { syncUrl?: boolean }) {
+  const initialSearch = useSyncExternalStore(subscribeNothing, clientSearch, serverSearch)
+  const [state, setState] = useState<StudioState>(() => createState({}).state)
+  const [notice, setNotice] = useState<string | null>(null)
+  const [appliedSearch, setAppliedSearch] = useState("")
+  if (appliedSearch !== initialSearch) {
+    setAppliedSearch(initialSearch)
+    if (initialSearch.length > 0) {
+      const next = createState(readSearchQuery())
+      setState(next.state)
+      if (next.notice) setNotice(next.notice)
+    }
+  }
   const [loaded, setLoaded] = useState<LoadedFont | null>(null)
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading")
   const [loadKey, setLoadKey] = useState(0)
@@ -69,17 +73,12 @@ export function Studio({
   const cssFamily = status === "ready" && loaded ? loaded.cssFamily : null
 
   useEffect(() => {
-    if (!syncUrl) return
-    const qs = encodeState(state)
-    const next = `${window.location.pathname}?${qs}`
-    if (`${window.location.pathname}${window.location.search}` === next) return
-    const historyState = window.history.state
-    const data =
-      historyState && typeof historyState === "object"
-        ? { ...historyState, __NA: true }
-        : { __NA: true }
-    window.history.replaceState(data, "", next)
-  }, [state, syncUrl])
+    if (!syncUrl || appliedSearch !== initialSearch) return
+    const frame = requestAnimationFrame(() => {
+      replacePoseUrl(`${window.location.pathname}?${encodeState(state)}`)
+    })
+    return () => cancelAnimationFrame(frame)
+  }, [appliedSearch, initialSearch, state, syncUrl])
 
   useEffect(() => {
     if (state.fontId === "local") return
@@ -151,6 +150,7 @@ export function Studio({
     const next = quantize(value, axis)
     setState((current) => {
       const key = current.active === "a" ? "poseA" : "poseB"
+      if (current[key][tag] === next) return current
       return { ...current, [key]: { ...current[key], [tag]: next } }
     })
   }
@@ -512,6 +512,19 @@ const EMPTY_AXES: [] = []
 
 function subscribeNothing() {
   return () => {}
+}
+
+let cachedSearch: string | null = null
+
+function clientSearch() {
+  // Freeze the first client read. Later pose writes update the address bar
+  // and must not be pulled back in as a new snapshot.
+  if (cachedSearch === null) cachedSearch = window.location.search
+  return cachedSearch
+}
+
+function serverSearch() {
+  return ""
 }
 
 function mediaRecorderSupported() {
