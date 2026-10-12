@@ -21,6 +21,8 @@ import type { PoseId, StudioView } from "@/lib/types"
 const labButton =
   "h-9 rounded-none border border-[#161513]/25 bg-transparent px-2.5 font-mono text-[11px] tracking-[0.14em] text-[#161513] uppercase shadow-none hover:border-[#161513] hover:bg-[#161513] hover:text-white"
 
+const SUPPORT_URL = "https://buymeacoffee.com/whynotartmoney"
+
 type PanelProps = {
   fontId: string
   text: string
@@ -330,38 +332,50 @@ export function ControlPanel(props: PanelProps) {
 
       <footer className="colophon">
         <p>Specterfold · OpenX series 03</p>
-        <Dialog>
-          <DialogTrigger
-            render={
-              <button type="button" className="text-button">
-                Colophon
-              </button>
-            }
-          />
-          <DialogContent className="colophon-dialog rounded-none border border-[#161513] bg-white p-6 text-[#161513] ring-0 sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Type, folded in light</DialogTitle>
-              <DialogDescription>
-                Specterfold is OpenX series 03, an open instrument for variable type.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="colophon-body">
-              <p>
-                The stage cuts a line into horizontal pleats. Weight decides how many.
-                Width, or optical size when a face has no width axis, decides how far
-                they throw. Slant shears the stack. Custom axes rotate the spectrum.
-              </p>
-              <p>
-                Google faces are requested through this app and served by Google Fonts.
-                A file you upload is parsed here and is not sent anywhere.
-              </p>
-              <p>
-                MIT license. A hosted Pro bench — saved libraries, shared rooms — can
-                come later. This one is the open lab.
-              </p>
-            </div>
-          </DialogContent>
-        </Dialog>
+        <span className="colophon-links">
+          <Dialog>
+            <DialogTrigger
+              render={
+                <button type="button" className="text-button">
+                  Colophon
+                </button>
+              }
+            />
+            <DialogContent className="colophon-dialog rounded-none border border-[#161513] bg-white p-6 text-[#161513] ring-0 sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>Type, folded in light</DialogTitle>
+                <DialogDescription>
+                  Specterfold is OpenX series 03, an open instrument for variable type.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="colophon-body">
+                <p>
+                  The stage cuts a line into horizontal pleats. Weight decides how many.
+                  Width, or optical size when a face has no width axis, decides how far
+                  they throw. Slant shears the stack. Custom axes rotate the spectrum.
+                </p>
+                <p>
+                  Google faces are requested through this app and served by Google Fonts.
+                  A file you upload is parsed here and is not sent anywhere.
+                </p>
+                <p>
+                  MIT license. A hosted Pro bench — saved libraries, shared rooms — can
+                  come later. This one is the open lab.
+                </p>
+                <p>
+                  Support the open lab:{" "}
+                  <a href={SUPPORT_URL} target="_blank" rel="noopener noreferrer">
+                    buy me a coffee
+                  </a>
+                  .
+                </p>
+              </div>
+            </DialogContent>
+          </Dialog>
+          <a className="text-button" href={SUPPORT_URL} target="_blank" rel="noopener noreferrer">
+            Buy me a coffee
+          </a>
+        </span>
       </footer>
     </aside>
   )
