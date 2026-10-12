@@ -27,7 +27,15 @@ import { clampText, createState, encodeState, type SearchQuery } from "@/lib/url
 
 type Morph = { t: number; values: Record<string, number> } | null
 
-export function Studio({ initialQuery }: { initialQuery: SearchQuery }) {
+const FALLBACK_FAMILY = "Palatino Linotype"
+
+export function Studio({
+  initialQuery,
+  syncUrl = true,
+}: {
+  initialQuery: SearchQuery
+  syncUrl?: boolean
+}) {
   const initial = useMemo(() => createState(initialQuery), [initialQuery])
   const [state, setState] = useState<StudioState>(initial.state)
   const [notice, setNotice] = useState<string | null>(initial.notice)
@@ -61,12 +69,17 @@ export function Studio({ initialQuery }: { initialQuery: SearchQuery }) {
   const cssFamily = status === "ready" && loaded ? loaded.cssFamily : null
 
   useEffect(() => {
+    if (!syncUrl) return
     const qs = encodeState(state)
     const next = `${window.location.pathname}?${qs}`
-    if (`${window.location.pathname}${window.location.search}` !== next) {
-      window.history.replaceState(null, "", next)
-    }
-  }, [state])
+    if (`${window.location.pathname}${window.location.search}` === next) return
+    const historyState = window.history.state
+    const data =
+      historyState && typeof historyState === "object"
+        ? { ...historyState, __NA: true }
+        : { __NA: true }
+    window.history.replaceState(data, "", next)
+  }, [state, syncUrl])
 
   useEffect(() => {
     if (state.fontId === "local") return
@@ -77,11 +90,24 @@ export function Studio({ initialQuery }: { initialQuery: SearchQuery }) {
         if (cancel) return
         setLoaded(next)
         setStatus("ready")
+        setError(null)
       })
       .catch((reason: unknown) => {
         if (cancel) return
-        setStatus("error")
-        setError(reason instanceof Error ? reason.message : "Could not load that font.")
+        setLoaded({
+          id: font.id,
+          family: font.family,
+          cssFamily: FALLBACK_FAMILY,
+          axes: font.axes,
+          source: "google",
+          staticFace: false,
+        })
+        setStatus("ready")
+        setError(
+          reason instanceof Error
+            ? `${reason.message} Showing a fallback face so the lab can stay open.`
+            : "Could not load that font. Showing a fallback face so the lab can stay open.",
+        )
       })
     return () => {
       cancel = true
@@ -94,20 +120,24 @@ export function Studio({ initialQuery }: { initialQuery: SearchQuery }) {
     measure.current = canvas
     const ctx = canvas.getContext("2d")
     if (!ctx) return
-    const make = (values: Record<string, number>, pose: string) =>
-      layoutSpecimen(ctx, {
-        text: state.text,
-        family: cssFamily,
-        values,
-        axes,
-        captionLeft: captionFor(familyLabel, axes, values),
-        captionRight: pose,
+    try {
+      const make = (values: Record<string, number>, pose: string) =>
+        layoutSpecimen(ctx, {
+          text: state.text,
+          family: cssFamily,
+          values,
+          axes,
+          captionLeft: captionFor(familyLabel, axes, values),
+          captionRight: pose,
+        })
+      setLayouts({
+        single: make(shown, morph ? "FOLD" : `POSE ${state.active.toUpperCase()}`),
+        a: make(state.poseA, "POSE A"),
+        b: make(state.poseB, "POSE B"),
       })
-    setLayouts({
-      single: make(shown, morph ? "FOLD" : `POSE ${state.active.toUpperCase()}`),
-      a: make(state.poseA, "POSE A"),
-      b: make(state.poseB, "POSE B"),
-    })
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : "Could not draw that line.")
+    }
   }, [axes, cssFamily, familyLabel, morph, shown, state.active, state.poseA, state.poseB, state.text])
 
   useEffect(() => {
@@ -349,12 +379,6 @@ export function Studio({ initialQuery }: { initialQuery: SearchQuery }) {
         <div className="mast-id">
           <p className="eyebrow">OpenX · 03</p>
           <h1 className="wordmark">Specterfold</h1>
-        </div>
-        <div className="mast-tag">
-          <p>Type, folded in light</p>
-          <p className="mast-zh" lang="zh-Hant">
-            摺進光裡的字
-          </p>
         </div>
       </header>
 

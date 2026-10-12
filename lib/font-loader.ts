@@ -2,27 +2,35 @@ import type { FontFaceSource, LoadedFont } from "@/lib/types"
 import type { CatalogFont } from "@/lib/types"
 import { parseFontBytes } from "@/lib/parse-sfnt"
 
-const LINK_ID = "specterfold-font-css"
+const STYLE_ID = "specterfold-font-css"
+const FONT_TIMEOUT_MS = 8000
+
+export function specimenFamily(family: string) {
+  return `Specterfold ${family}`
+}
 
 export async function loadGoogleFont(font: CatalogFont): Promise<LoadedFont> {
   const href = `/api/font-css?id=${encodeURIComponent(font.id)}`
-  const css = await fetch(href).then(async (response) => {
-    if (!response.ok) {
-      throw new Error(`Could not load ${font.family}.`)
-    }
-    return response.text()
-  })
+  const response = await fetch(href)
+  if (!response.ok) {
+    throw new Error(`Could not load ${font.family}.`)
+  }
+  const cssFamily = specimenFamily(font.family)
+  const css = rewriteFontFamily(await response.text(), font.family, cssFamily)
   const faces = parseFontCss(css)
   if (!faces.length) {
     throw new Error(`${font.family} did not return a font file.`)
   }
-  await mountStylesheet(href)
-  await document.fonts.load(`400 80px "${font.family}"`, "Specterfold Hamburgefontsiv")
-  await document.fonts.ready
+  mountCss(css)
+  await withTimeout(
+    document.fonts.load(`400 80px "${cssFamily}"`, "Specterfold Hamburgefontsiv"),
+    FONT_TIMEOUT_MS,
+    `${font.family} took too long to load.`,
+  )
   return {
     id: font.id,
     family: font.family,
-    cssFamily: font.family,
+    cssFamily,
     axes: font.axes,
     source: "google",
     faces,
@@ -63,15 +71,32 @@ export function parseFontCss(css: string): FontFaceSource[] {
   return faces
 }
 
-function mountStylesheet(href: string): Promise<void> {
+export function rewriteFontFamily(css: string, from: string, to: string) {
+  return css
+    .replaceAll(`font-family: '${from}'`, `font-family: '${to}'`)
+    .replaceAll(`font-family: "${from}"`, `font-family: "${to}"`)
+}
+
+function mountCss(css: string) {
+  document.getElementById(STYLE_ID)?.remove()
+  const style = document.createElement("style")
+  style.id = STYLE_ID
+  style.textContent = css
+  document.head.appendChild(style)
+}
+
+function withTimeout<T>(work: Promise<T>, ms: number, message: string): Promise<T> {
   return new Promise((resolve, reject) => {
-    document.getElementById(LINK_ID)?.remove()
-    const link = document.createElement("link")
-    link.id = LINK_ID
-    link.rel = "stylesheet"
-    link.href = href
-    link.onload = () => resolve()
-    link.onerror = () => reject(new Error("The font stylesheet failed to load."))
-    document.head.appendChild(link)
+    const timer = window.setTimeout(() => reject(new Error(message)), ms)
+    work.then(
+      (value) => {
+        window.clearTimeout(timer)
+        resolve(value)
+      },
+      (reason: unknown) => {
+        window.clearTimeout(timer)
+        reject(reason instanceof Error ? reason : new Error(message))
+      },
+    )
   })
 }
