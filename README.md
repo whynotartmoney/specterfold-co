@@ -66,7 +66,11 @@ Google Fonts CSS is fetched from a route handler so the browser can read the fil
 
 **本地執行：** `npm install` 之後 `npm run dev`，打開 Next 印出的網址（預設 [http://localhost:3000](http://localhost:3000)）。`npm test` 檢查字體表解析，`npm run build` 做正式建置。不需要環境變數。字體檔在瀏覽器裡解析，不會上傳。
 
-授權為 [MIT](LICENSE)。
+授權為 [MIT](LICENSE)。若這間實驗室有用，歡迎 [請我喝杯咖啡](https://buymeacoffee.com/whynotartmoney)。
+
+## Support
+
+If this lab is useful, [buy me a coffee](https://buymeacoffee.com/whynotartmoney).
 
 ## Out of scope
 

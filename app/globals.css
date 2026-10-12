@@ -481,8 +481,10 @@
 
 .colophon {
   display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
   justify-content: space-between;
-  gap: 12px;
+  gap: 8px 14px;
   padding: 16px 18px 22px;
   font-family: var(--font-mono), ui-monospace, monospace;
   font-size: 11px;
@@ -492,6 +494,14 @@
 
 .colophon p {
   margin: 0;
+}
+
+.colophon-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px 14px;
+  margin-left: auto;
 }
 
 .text-button {
@@ -518,6 +528,11 @@
 
 .colophon-body p {
   margin: 0;
+}
+
+.colophon-body a {
+  color: var(--signal);
+  text-underline-offset: 3px;
 }
 
 .colophon-dialog h2 {
