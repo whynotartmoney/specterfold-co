@@ -19,7 +19,7 @@ import type { AxisDef } from "@/lib/types"
 import type { PoseId, StudioView } from "@/lib/types"
 
 const labButton =
-  "h-9 rounded-none border border-[#161513]/25 bg-transparent px-2.5 font-mono text-[11px] tracking-[0.14em] text-[#161513] uppercase shadow-none hover:border-[#161513] hover:bg-[#161513] hover:text-[#f3efe4]"
+  "h-9 rounded-none border border-[#161513]/25 bg-transparent px-2.5 font-mono text-[11px] tracking-[0.14em] text-[#161513] uppercase shadow-none hover:border-[#161513] hover:bg-[#161513] hover:text-white"
 
 type PanelProps = {
   fontId: string
@@ -338,7 +338,7 @@ export function ControlPanel(props: PanelProps) {
               </button>
             }
           />
-          <DialogContent className="colophon-dialog rounded-none border border-[#161513] bg-[#f3efe4] p-6 text-[#161513] ring-0 sm:max-w-md">
+          <DialogContent className="colophon-dialog rounded-none border border-[#161513] bg-white p-6 text-[#161513] ring-0 sm:max-w-md">
             <DialogHeader>
               <DialogTitle>Type, folded in light</DialogTitle>
               <DialogDescription>

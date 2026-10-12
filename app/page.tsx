@@ -1,9 +1,20 @@
+import { Suspense } from "react";
 import { Studio } from "@/components/studio";
 import type { SearchQuery } from "@/lib/url-state";
 
-export const instant = false;
+export default function Home({
+  searchParams,
+}: {
+  searchParams: Promise<SearchQuery>;
+}) {
+  return (
+    <Suspense fallback={<Studio initialQuery={{}} syncUrl={false} />}>
+      <QueriedStudio searchParams={searchParams} />
+    </Suspense>
+  );
+}
 
-export default async function Home({
+async function QueriedStudio({
   searchParams,
 }: {
   searchParams: Promise<SearchQuery>;

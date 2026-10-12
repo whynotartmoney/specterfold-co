@@ -83,6 +83,7 @@
   --sidebar-ring: #e23b22;
   --stage: #0e0f0c;
   --paper: #f3efe4;
+  --system: #ffffff;
   --ink: #161513;
   --signal: #e23b22;
   --mist: #c8c1b4;
@@ -146,26 +147,6 @@
   padding-bottom: 0.08em;
 }
 
-.mast-tag {
-  text-align: right;
-  font-family: var(--font-display), "Iowan Old Style", serif;
-  font-size: clamp(1.05rem, 2vw, 1.45rem);
-  font-variation-settings: "opsz" 36, "SOFT" 10, "WONK" 0, "wght" 460;
-  line-height: 1.15;
-  color: var(--paper);
-}
-
-.mast-tag p {
-  margin: 0;
-}
-
-.mast-zh {
-  margin-top: 4px !important;
-  font-family: "Songti TC", "Noto Serif TC", "PMingLiU", "WenQuanYi Micro Hei", "Droid Sans Fallback", serif;
-  font-size: 0.92em;
-  letter-spacing: 0.12em;
-  color: var(--mist);
-}
 
 .stage-wrap {
   position: relative;
@@ -282,7 +263,7 @@
 .panel {
   min-height: 0;
   overflow: auto;
-  background: var(--paper);
+  background: var(--system);
   color: var(--ink);
   border-left: 1px solid var(--signal);
 }
@@ -495,7 +476,7 @@
 
 .panel .is-filled {
   background: var(--ink);
-  color: var(--paper);
+  color: var(--system);
 }
 
 .colophon {
@@ -564,10 +545,6 @@
     flex-direction: column;
     gap: 10px;
     padding: 16px 16px 14px;
-  }
-
-  .mast-tag {
-    text-align: left;
   }
 
   .compare {
