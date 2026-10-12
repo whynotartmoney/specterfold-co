@@ -12,7 +12,16 @@ export function SpecimenView({
   label: string
 }) {
   const prefix = useId().replaceAll(":", "")
-  const markup = specimenMarkup(layout, { idPrefix: prefix })
+  let markup: string
+  try {
+    markup = specimenMarkup(layout, { idPrefix: prefix })
+  } catch {
+    return (
+      <div className="stage-pending">
+        <p>Could not draw that line.</p>
+      </div>
+    )
+  }
   return (
     <div
       className="specimen-view"
