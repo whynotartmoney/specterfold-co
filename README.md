@@ -1,9 +1,8 @@
 # Specterfold
 
-[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Demo](https://img.shields.io/badge/demo-specterfold--co.vercel.app-111111.svg)](https://specterfold-co.vercel.app)
+[![MIT License](https://img.shields.io/badge/license-MIT-111111)](LICENSE) [![Live demo](https://img.shields.io/badge/demo-specterfold--co.vercel.app-111111)](https://specterfold-co.vercel.app) [![GitHub stars](https://img.shields.io/github/stars/whynotartmoney/specterfold-co?style=flat&color=111111)](https://github.com/whynotartmoney/specterfold-co/stargazers)
 
-**Type, folded in light.** 摺進光裡的字.
+**Type, folded in light.** 摺進光裡的字. Browser lab for variable fonts — fold axes into a spectrum and export PNG, SVG, or WebM.
 
 Specterfold is a browser lab for variable fonts. It is **OpenX series project 03**: load a variable face, set a line, and watch the axes fold the letterforms into a spectrum. The studio runs entirely in the browser.
 
